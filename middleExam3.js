@@ -63,29 +63,30 @@ var VendingMachine = (function () {
 
     VendingMachine.prototype.selectDrink = function (money) {
         rl.question('선택하세요 : ', function (select) {
-            var check = 0;
-            var length = this.drinks.drinkArray.length;
+            var selectedDrink = this.bringDrink(select);
 
-            this.drinks.drinkArray.forEach(function (drink, index) {
-                if (drink.name === select) {
-                    if (drink.amount < 1) {
-                        this.messages.empty();
-                        this.selectDrink(money);
-                    } else {
-                        drink.amount--;
-                        this.messages.select(select);
-                        this.requestRepurchase(money - drink.price);
-                    }
-                    check++;
-                }
-
-                if (check === 0 && (length - 1) === index) {
-                    this.messages.prohibition();
+            if (!selectedDrink) {
+                this.messages.prohibition();
+                this.selectDrink(money);
+            } else {
+                if (selectedDrink.amount < 1) {
+                    this.messages.empty();
                     this.selectDrink(money);
+                } else if (selectedDrink.amount >= 1) {
+                    selectedDrink.amount--;
+                    this.messages.select(select);
+                    this.requestRepurchase(money - selectedDrink.price);
                 }
-            }.bind(this));
+            }
         }.bind(this));
     };
+    VendingMachine.prototype.bringDrink = function (select) {
+        var selectedDrink;
+        selectedDrink = this.drinks.drinkArray.filter(function (drink) {
+            return drink.name === select;
+        });
+        return selectedDrink[0];
+    }
 
     VendingMachine.prototype.requestRepurchase = function (changes) {
         rl.question('다른걸 구매할까요? 반환할까요? ', function (answer) {
