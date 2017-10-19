@@ -15,12 +15,15 @@ var VendingMachine = (function () {
     function VendingMachine() {
         this.drinks = new Drinks();
         this.fund = 0;
-        this.errMsgs = {
+        this.messages = {
             empty: function () {
                 console.log("재고가 없습니다.");
             },
+            notAvailable: function () {
+                console.log("구매가능한 음료수가 없습니다.");
+            },
             available: function (availableDrink) {
-                console.log("사용가능한 음료수  : " + availableDrink);
+                console.log("구매가능한 음료수  : " + availableDrink);
             },
             select: function (select) {
                 console.log(select + "가 나왔습니다.");
@@ -38,6 +41,9 @@ var VendingMachine = (function () {
             this.availableDrink(money) ? this.selectDrink(money) : this.requestRepurchase(money);
         }.bind(this));
     };
+    VendingMachine.prototype.addDrink = function (name, price, amount) {
+        this.drinks.addDrink(name, price, amount);
+    };
     VendingMachine.prototype.availableDrink = function (money) {
         var availableDrink = '';
         this.drinks.drinkArray.filter(function (drink) {
@@ -47,10 +53,10 @@ var VendingMachine = (function () {
             availableDrink += drink.name + "(" + price + ") ";
         });
         if (availableDrink === '') {
-            this.errMsgs.empty();
+            this.messages.notAvailable();
             return false;
         } else {
-            this.errMsgs.available(availableDrink);
+            this.messages.available(availableDrink);
             return true;
         }
     };
@@ -59,21 +65,22 @@ var VendingMachine = (function () {
         rl.question('선택하세요 : ', function (select) {
             var check = 0;
             var length = this.drinks.drinkArray.length;
+
             this.drinks.drinkArray.forEach(function (drink, index) {
                 if (drink.name === select) {
                     if (drink.amount < 1) {
-                        this.errMsgs.empty();
+                        this.messages.empty();
                         this.selectDrink(money);
                     } else {
                         drink.amount--;
-                        this.errMsgs.select(select);
+                        this.messages.select(select);
                         this.requestRepurchase(money - drink.price);
                     }
                     check++;
                 }
 
                 if (check === 0 && (length - 1) === index) {
-                    this.errMsgs.prohibition();
+                    this.messages.prohibition();
                     this.selectDrink(money);
                 }
             }.bind(this));
@@ -83,7 +90,7 @@ var VendingMachine = (function () {
     VendingMachine.prototype.requestRepurchase = function (changes) {
         rl.question('다른걸 구매할까요? 반환할까요? ', function (answer) {
             if (answer === "반환") {
-                this.errMsgs.changes(changes);
+                this.messages.changes(changes);
                 rl.close();
             } else if (!Number.isNaN(parseInt(answer))) {
                 this.availableDrink(changes) ? this.selectDrink(changes) : this.requestRepurchase(changes);
@@ -99,44 +106,29 @@ var Drinks = (function () {
     function Drinks() {
         this.drinkArray = [];
     }
-    Drinks.prototype.addDrink = function (name, price, amount) {
-        var drink = new Drink(name, price, amount);
-        this.drinkArray.push(drink);
-    }
-    Drinks.prototype.getDrinkPrice = function (name) {
-        var price;
-        this.drinkArray.filter(function (drink) {
-            return drink.name === name;
-        }).forEach(function (drink) {
-            price = drink.price;
-        });
-        return price;
-    }
-    Drinks.prototype.bringDrink = function (name) {
-        this.drinkArray.filter(function (drink) {
-            return drink.name === name;
-        }).forEach(function (drink) {
-            drink.amount--;
-        });
-    }
 
     function Drink(name, price, amount) {
         this.name = name;
         this.price = price;
         this.amount = amount;
-    };
+    }
+
+    Drinks.prototype.addDrink = function (name, price, amount) {
+        var drink = new Drink(name, price, amount);
+        this.drinkArray.push(drink);
+    }
     return Drinks;
 })();
 
 (function () {
     var drinkMachine = new VendingMachine();
-    drinkMachine.drinks.addDrink("콜라", 1000, 5);
-    drinkMachine.drinks.addDrink("사이다", 1000, 7);
-    drinkMachine.drinks.addDrink("포도쥬스", 700, 2);
-    drinkMachine.drinks.addDrink("딸기우유", 500, 1);
-    drinkMachine.drinks.addDrink("미에로화이바", 900, 3);
-    drinkMachine.drinks.addDrink("물", 500, 4);
-    drinkMachine.drinks.addDrink("파워에이드", 800, 0);
+    drinkMachine.addDrink("콜라", 1000, 5);
+    drinkMachine.addDrink("사이다", 1000, 7);
+    drinkMachine.addDrink("포도쥬스", 700, 2);
+    drinkMachine.addDrink("딸기우유", 500, 1);
+    drinkMachine.addDrink("미에로화이바", 900, 3);
+    drinkMachine.addDrink("물", 500, 4);
+    drinkMachine.addDrink("파워에이드", 800, 0);
 
     drinkMachine.insertCoin();
 })();
