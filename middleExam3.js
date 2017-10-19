@@ -1,6 +1,5 @@
 "use strict";
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var readline = require('readline');
 var rl = readline.createInterface({
@@ -9,8 +8,6 @@ var rl = readline.createInterface({
 });
 
 function Drink(name, price, amount) {
-    _classCallCheck(this, Drink);
-
     this.name = name;
     this.price = price;
     this.amount = amount;
@@ -29,7 +26,8 @@ function availableDrink(money) {
     drinks.filter(function (drink) {
         return drink.price <= money;
     }).forEach(function (drink) {
-        availableDrink += drink.name + "(" + (drink.amount > 0 ? drink.price : "재고없음") + ") ";
+        var price = drink.amount > 0 ? drink.price : "재고없음";
+        availableDrink += drink.name + "(" + price + ") ";
     });
     if (availableDrink === '') {
         console.log("재고 없음");
@@ -43,6 +41,7 @@ function availableDrink(money) {
 function selectDrink(money) {
     rl.question('선택하세요 : ', function (select) {
         var check = 0;
+        var length = drinks.length;
         drinks.forEach(function (drink, index) {
             if (drink.name === select) {
                 if (drink.amount < 1) {
@@ -56,7 +55,7 @@ function selectDrink(money) {
                 check++;
             }
 
-            if (check === 0 && drinks.length - 1 === index) {
+            if (check === 0 && (length - 1) === index) {
                 console.log("선택할 수 없습니다.");
                 selectDrink(money);
             }
