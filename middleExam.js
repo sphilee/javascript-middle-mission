@@ -25,6 +25,11 @@ var widget = {
     }
 }
 
+Number.isInteger = function (value) {
+    return typeof value === 'number' &&
+        isFinite(value) &&
+        Math.floor(value) === value;
+};
 
 function checkTypeNum(object) {
     Object.keys(object).map(function (objectKey, index) {
