@@ -29,7 +29,7 @@ var widget = {
 function checkTypeNum(object) {
     Object.keys(object).map(function (objectKey, index) {
         var value = object[objectKey];
-        if (value.toString() === "[object Object]") {
+        if (Object.prototype.toString.call(value) === "[object Object]") {
             checkTypeNum(value);
         } else if (Number.isInteger(value)) {
             output.push(objectKey);
