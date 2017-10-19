@@ -1,10 +1,12 @@
 "use strict";
-
-var readline = require('readline');
-var rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
+var rl = (function () {
+    var readline = require('readline');
+    var rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+    return rl;
+})();
 
 Number.isNaN = Number.isNaN || function (value) {
     return value !== value;
